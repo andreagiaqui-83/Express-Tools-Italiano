@@ -1,0 +1,91 @@
+name: "🐞 Segnalazione bug"
+description: "Segnala un problema, un comando non funzionante o una parte ancora in inglese."
+title: "[BUG] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Grazie per aver segnalato un problema di **Express Tools Italiano**.
+
+        Compila le informazioni seguenti. Più dettagli fornisci, più sarà semplice individuare e correggere il problema.
+
+  - type: input
+    id: autocad-version
+    attributes:
+      label: "Versione di AutoCAD"
+      description: "Indica la versione e la lingua di AutoCAD."
+      placeholder: "Esempio: AutoCAD 2027 Italiano"
+    validations:
+      required: true
+
+  - type: input
+    id: express-tools-version
+    attributes:
+      label: "Versione di Express Tools Italiano"
+      description: "Indica la versione installata."
+      placeholder: "Esempio: 3.1"
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: "Comando interessato"
+      description: "Se il problema riguarda un comando specifico, indicane il nome."
+      placeholder: "Esempio: TXTEXP, TCASE, BREAKLINE, ARCTEXT..."
+
+  - type: dropdown
+    id: problem-type
+    attributes:
+      label: "Tipo di problema"
+      options:
+        - "Comando non funzionante"
+        - "Testo o finestra ancora in inglese"
+        - "Traduzione errata o migliorabile"
+        - "Problema di installazione o aggiornamento"
+        - "Problema di ripristino o disinstallazione"
+        - "Blocco o errore di AutoCAD"
+        - "Altro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descrizione del problema"
+      description: "Descrivi cosa è successo e, se possibile, i passaggi necessari per riprodurre il problema."
+      placeholder: |
+        1. Avvio il comando...
+        2. Seleziono...
+        3. Compare...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Comportamento previsto"
+      description: "Descrivi cosa ti aspettavi che accadesse."
+
+  - type: textarea
+    id: command-line
+    attributes:
+      label: "Messaggi della riga di comando"
+      description: "Se utile, copia qui i messaggi visualizzati nella riga di comando di AutoCAD."
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "Screenshot o altri dettagli"
+      description: "Puoi trascinare qui eventuali screenshot utili per capire il problema."
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Verifiche"
+      options:
+        - label: "Ho verificato di utilizzare una versione di Express Tools Italiano scaricata da questo repository GitHub."
+          required: true
+        - label: "Ho controllato che non esista già una segnalazione dello stesso problema."
+          required: true
