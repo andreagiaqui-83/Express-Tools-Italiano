@@ -1,0 +1,39 @@
+name: Remove withdrawn distributions
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/withdraw-distributions.yml']
+permissions:
+  contents: write
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Remove inventoried releases and tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_RELEASES: '[380742592]'
+          EXPECTED_TAGS: '{"refs/tags/v3.1":"d33bf9bad5f66c0464190effac3a766e8e083815"}'
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          repo=os.environ["GITHUB_REPOSITORY"]
+          base="https://api.github.com/repos/"+repo
+          headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],"Accept":"application/vnd.github+json"}
+          def api(path, method="GET"):
+              req=urllib.request.Request(base+path,headers=headers,method=method)
+              with urllib.request.urlopen(req) as res:
+                  body=res.read()
+                  return json.loads(body) if body else None
+          expected=json.loads(os.environ["EXPECTED_RELEASES"])
+          tags=json.loads(os.environ["EXPECTED_TAGS"])
+          releases=api("/releases?per_page=100")
+          assert len(releases)==len(expected) and {r["id"] for r in releases}==set(expected), "Release inventory changed"
+          refs=api("/git/refs/tags")
+          assert {r["ref"]:r["object"]["sha"] for r in refs}==tags, "Tag inventory changed"
+          for rid in expected: api("/releases/"+str(rid),"DELETE")
+          for ref in tags: api("/git/"+ref,"DELETE")
+          assert api("/releases?per_page=100")==[]
+          print("All inventoried releases, attachments and tags removed.")
+          PY
