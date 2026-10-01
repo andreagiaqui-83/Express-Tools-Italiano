@@ -1,0 +1,41 @@
+name: Build ETIT CommandBridge 3.9
+
+on:
+  push:
+    branches:
+      - build/command-bridge-3.9
+    paths:
+      - 'bridge-3.9/**'
+      - '.github/workflows/build-etit-commandbridge-3.9.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        working-directory: bridge-3.9
+        run: dotnet restore ETIT_CommandBridge_3_9.csproj
+      - name: Build
+        working-directory: bridge-3.9
+        run: dotnet build ETIT_CommandBridge_3_9.csproj -c Release --no-restore
+      - name: Inspect output
+        shell: pwsh
+        run: |
+          Get-ChildItem bridge-3.9/bin/Release/net10.0 | Format-Table Name,Length
+          $dll = 'bridge-3.9/bin/Release/net10.0/ETIT_CommandBridge_3_9.dll'
+          if (!(Test-Path $dll)) { throw 'Bridge DLL non generata' }
+          Get-FileHash $dll -Algorithm SHA256
+      - name: Upload bridge
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETIT_CommandBridge_3_9
+          path: bridge-3.9/bin/Release/net10.0/ETIT_CommandBridge_3_9.dll
+          if-no-files-found: error
