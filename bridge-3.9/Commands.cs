@@ -26,7 +26,7 @@ public static class Commands
 {
     public const string GroupName = "ETIT_COMMAND_BRIDGE_39";
 
-    [CommandMethod(GroupName, "ETIT_ARCTEXT_CMD", "ARCTEXT", CommandFlags.Modal | CommandFlags.Redraw)]
+    [CommandMethod(GroupName, "ETIT_ARCTEXT_CMD", "ArcTextLocalName", CommandFlags.Modal | CommandFlags.Redraw)]
     public static void ArcText()
     {
         Document? doc = Application.DocumentManager.MdiActiveDocument;
