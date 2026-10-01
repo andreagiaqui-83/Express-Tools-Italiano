@@ -50,7 +50,7 @@ public static class Commands
             DBObject obj = tr.GetObject(result.ObjectId, OpenMode.ForRead);
             dxfName = obj.GetRXClass().DxfName ?? string.Empty;
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
             ed.WriteMessage("\n[ETIT] Impossibile leggere l'oggetto selezionato: " + ex.Message);
             return;
