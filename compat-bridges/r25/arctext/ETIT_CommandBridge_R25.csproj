@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ETIT_CommandBridge_R25</AssemblyName>
+    <RootNamespace>Etit.CommandBridge</RootNamespace>
+    <Version>4.12.0</Version>
+    <AssemblyVersion>4.12.0.0</AssemblyVersion>
+    <FileVersion>4.12.0.0</FileVersion>
+    <InformationalVersion>4.12</InformationalVersion>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoCAD.NET" Version="25.0.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
