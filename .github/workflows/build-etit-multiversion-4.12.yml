@@ -1,0 +1,50 @@
+name: Build ETIT MultiVersion Bridges 4.12
+on:
+  push:
+    branches: [build/multiversion-4.12]
+    paths:
+      - 'compat-bridges/**'
+      - '.github/workflows/build-etit-multiversion-4.12.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: r25-arctext
+            project: compat-bridges/r25/arctext/ETIT_CommandBridge_R25.csproj
+            output: compat-bridges/r25/arctext/bin/Release/net8.0/ETIT_CommandBridge_R25.dll
+          - id: r25-native
+            project: compat-bridges/r25/native/ETIT_NativePromptBridge_R25.csproj
+            output: compat-bridges/r25/native/bin/Release/net8.0/ETIT_NativePromptBridge_R25.dll
+          - id: r24-arctext
+            project: compat-bridges/r24/arctext/ETIT_CommandBridge_R24.csproj
+            output: compat-bridges/r24/arctext/bin/Release/net48/ETIT_CommandBridge_R24.dll
+          - id: r24-native
+            project: compat-bridges/r24/native/ETIT_NativePromptBridge_R24.csproj
+            output: compat-bridges/r24/native/bin/Release/net48/ETIT_NativePromptBridge_R24.dll
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        shell: pwsh
+        run: dotnet restore "${{ matrix.project }}"
+      - name: Build
+        shell: pwsh
+        run: dotnet build "${{ matrix.project }}" -c Release --no-restore
+      - name: Verify
+        shell: pwsh
+        run: |
+          if (!(Test-Path "${{ matrix.output }}")) { throw "DLL non generata" }
+          Get-FileHash "${{ matrix.output }}" -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ETIT-4.12-${{ matrix.id }}
+          path: ${{ matrix.output }}
+          if-no-files-found: error
