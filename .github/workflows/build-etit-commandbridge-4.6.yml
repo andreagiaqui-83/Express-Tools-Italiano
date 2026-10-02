@@ -1,0 +1,35 @@
+name: Build ETIT CommandBridge 4.6
+on:
+  push:
+    branches: [build/arctext-entsel-4.6]
+    paths:
+      - 'bridge-4.6/**'
+      - '.github/workflows/build-etit-commandbridge-4.6.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        working-directory: bridge-4.6
+        run: dotnet restore ETIT_CommandBridge_4_6.csproj
+      - name: Build
+        working-directory: bridge-4.6
+        run: dotnet build ETIT_CommandBridge_4_6.csproj -c Release --no-restore
+      - name: Verify
+        shell: pwsh
+        run: |
+          $dll='bridge-4.6/bin/Release/net10.0/ETIT_CommandBridge_4_6.dll'
+          if (!(Test-Path $dll)) { throw 'Bridge DLL non generata' }
+          Get-FileHash $dll -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ETIT_CommandBridge_4_6
+          path: bridge-4.6/bin/Release/net10.0/ETIT_CommandBridge_4_6.dll
+          if-no-files-found: error
