@@ -99,6 +99,24 @@ public static class Commands
             "\nExpress Tools Italiano 4.5 - intercettazione ARCTEXT disattivata.");
     }
 
+
+    [CommandMethod(GroupName, "ETIT_ARCTEXT_ORIGINALE", CommandFlags.Modal | CommandFlags.Redraw)]
+    public static void ArcTextOriginal()
+    {
+        Document? doc = Application.DocumentManager.MdiActiveDocument;
+        if (doc is null)
+            return;
+        try
+        {
+            Plugin.BackendCallInProgress = true;
+            doc.Editor.Command(".Acet:Arctext.ARCTEXT");
+        }
+        finally
+        {
+            Plugin.BackendCallInProgress = false;
+        }
+    }
+
     [CommandMethod(GroupName, "ETIT_BRIDGE_STATUS", CommandFlags.Modal | CommandFlags.NoUndoMarker)]
     public static void Status()
     {
