@@ -1,0 +1,48 @@
+name: Retire obsolete distributions requested by author
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/retire-obsolete-distributions.yml']
+permissions:
+  contents: write
+jobs:
+  retire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate and remove the explicitly identified old releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request, urllib.error
+          repository = os.environ['GITHUB_REPOSITORY']
+          assert repository == "andreagiaqui-83/Express-Tools-Italiano"
+          expected = [{"id":397801012,"tag":"v3.1","assets":[{"id":593718108,"name":"Express_Tools_Italiano_3.1.exe"}]}]
+          base = 'https://api.github.com/repos/' + repository
+          headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
+          def api(path, method='GET'):
+              request = urllib.request.Request(base + path, headers=headers, method=method)
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      data = response.read()
+                      return json.loads(data) if data else None
+              except urllib.error.HTTPError as error:
+                  if error.code == 404: return None
+                  raise
+          # Validate every intended release and every attached asset before deleting anything.
+          for item in expected:
+              actual = api('/releases/' + str(item['id']))
+              if actual is not None:
+                  assert actual['tag_name'] == item['tag'], 'Unexpected release tag'
+                  assert [{'id': a['id'], 'name': a['name']} for a in actual['assets']] == item['assets'], 'Release assets changed'
+          for item in expected:
+              api('/releases/' + str(item['id']), 'DELETE')
+              assert api('/releases/' + str(item['id'])) is None
+              api('/git/refs/tags/' + item['tag'], 'DELETE')
+              assert api('/git/refs/tags/' + item['tag']) is None
+              print('Retired release and tag:', item['tag'], 'assets:', len(item['assets']))
+          remaining = api('/releases?per_page=100')
+          assert remaining == [], 'Other releases remain; inspect separately'
+          print('Verified: no published releases remain in', repository)
+          PY
